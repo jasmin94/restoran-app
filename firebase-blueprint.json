@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "MenuItem": {
+      "title": "Menu Item",
+      "description": "Represents a dish in the restaurant menu",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["name", "price", "category", "image"]
+    },
+    "Reservation": {
+      "title": "Reservation",
+      "description": "Represents a table reservation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerUid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "guests": { "type": "integer" },
+        "note": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] }
+      },
+      "required": ["name", "date", "time", "guests", "status"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Represents a food order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerUid": { "type": "string" },
+        "customerName": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "type": { "type": "string", "enum": ["delivery", "pickup"] },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "preparing", "ready", "delivered", "cancelled"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["customerName", "type", "items", "total", "status", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a client profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "name", "email", "createdAt"]
+    },
+    "Worker": {
+      "title": "Worker",
+      "description": "Represents a restaurant employee",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["Konobar", "Kuhar", "Dostavljač", "Menadžer"] },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "password": { "type": "string" },
+        "joinedAt": { "type": "string" }
+      },
+      "required": ["name", "role", "email", "phone", "password", "joinedAt"]
+    }
+  },
+  "firestore": {
+    "menu": {
+      "schema": "MenuItem",
+      "description": "Collection of menu items"
+    },
+    "reservations": {
+      "schema": "Reservation",
+      "description": "Collection of table reservations"
+    },
+    "orders": {
+      "schema": "Order",
+      "description": "Collection of food orders"
+    },
+    "workers": {
+      "schema": "Worker",
+      "description": "Collection of restaurant workers"
+    },
+    "users": {
+      "schema": "UserProfile",
+      "description": "Collection of client profiles"
+    }
+  }
+}
