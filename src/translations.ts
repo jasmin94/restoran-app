@@ -9,7 +9,8 @@ export const translations = {
       myOrders: 'Moje Narudžbe',
       login: 'Prijavi se',
       logout: 'Odjavi se',
-      admin: 'Admin Panel'
+      admin: 'Admin Panel',
+      aboutUs: 'O Nama'
     },
     home: {
       heroTitle: 'Vrhunsko Gastronomsko Iskustvo',
@@ -95,6 +96,16 @@ export const translations = {
       rights: 'Sva prava pridržana.',
       aboutUs: 'O Nama'
     },
+    about: {
+      title: 'O Nama',
+      storyTitle: 'Naša Priča',
+      storyText: 'Osnovan 2010. godine, Gourmet Haven je postao sinonim za vrhunsku gastronomiju u Sarajevu. Naša strast prema hrani i posvećenost detaljima čine nas jedinstvenim mjestom za sve ljubitelje dobrog zalogaja.',
+      missionTitle: 'Naša Misija',
+      missionText: 'Pružiti nezaboravno iskustvo svakom gostu kroz inovativna jela, vrhunsku uslugu i ugodan ambijent.',
+      teamTitle: 'Naš Tim',
+      teamText: 'Naš tim čine iskusni kuhari i ljubazno osoblje koji svakodnevno rade na tome da vaš boravak kod nas bude savršen.',
+      galleryTitle: 'Galerija'
+    },
     common: {
       subtotal: 'Međuzbir',
       delivery: 'Dostava',
@@ -167,11 +178,30 @@ export const translations = {
       new: 'Novo',
       delivery: 'Dostava',
       pickup: 'Preuzimanje lično',
+      manageCategories: 'Upravljanje Kategorijama',
+      categoryName: 'Naziv Kategorije',
+      addCategory: 'Dodaj Kategoriju',
+      deleteCategory: 'Obriši Kategoriju',
+      manageAbout: 'Upravljanje O Nama',
+      editStory: 'Uredi Priču',
+      editMission: 'Uredi Misiju',
+      editTeam: 'Uredi Tim',
+      manageGallery: 'Upravljanje Galerijom',
+      addGalleryImage: 'Dodaj Sliku u Galeriju',
+      saveChanges: 'Sačuvaj Promjene',
+      manageBranding: 'Upravljanje Brendom',
+      restaurantName: 'Naziv Restorana',
+      brandColor: 'Boja Brenda',
+      logoUrl: 'URL Logotipa',
+      uploadLogo: 'Učitaj Logo',
+      branding: 'Brendiranje',
       categories: {
-        appetizers: 'Predjela',
-        main: 'Glavna jela',
-        desserts: 'Deserti',
-        drinks: 'Pića'
+        main: 'glavna jela',
+        cooked: 'kuhana jela',
+        cold: 'hladna predjela',
+        grill: 'sa roštilja',
+        drinks: 'piće',
+        sweets: 'slatki program'
       },
       roles: {
         waiter: 'Konobar',
@@ -189,7 +219,8 @@ export const translations = {
       myOrders: 'My Orders',
       login: 'Login',
       logout: 'Logout',
-      admin: 'Admin Panel'
+      admin: 'Admin Panel',
+      aboutUs: 'About Us'
     },
     home: {
       heroTitle: 'Taste Perfection in Every Bite',
@@ -275,6 +306,16 @@ export const translations = {
       rights: 'All rights reserved.',
       aboutUs: 'About Us'
     },
+    about: {
+      title: 'About Us',
+      storyTitle: 'Our Story',
+      storyText: 'Founded in 2010, Gourmet Haven has become synonymous with premium gastronomy in Sarajevo. Our passion for food and dedication to detail make us a unique place for all food lovers.',
+      missionTitle: 'Our Mission',
+      missionText: 'To provide an unforgettable experience to every guest through innovative dishes, top-notch service, and a pleasant atmosphere.',
+      teamTitle: 'Our Team',
+      teamText: 'Our team consists of experienced chefs and friendly staff who work daily to ensure your stay with us is perfect.',
+      galleryTitle: 'Gallery'
+    },
     common: {
       subtotal: 'Subtotal',
       delivery: 'Delivery',
@@ -347,11 +388,30 @@ export const translations = {
       new: 'New',
       delivery: 'Delivery',
       pickup: 'Pickup',
+      manageCategories: 'Manage Categories',
+      categoryName: 'Category Name',
+      addCategory: 'Add Category',
+      deleteCategory: 'Delete Category',
+      manageAbout: 'Manage About Us',
+      editStory: 'Edit Story',
+      editMission: 'Edit Mission',
+      editTeam: 'Edit Team',
+      manageGallery: 'Manage Gallery',
+      addGalleryImage: 'Add Image to Gallery',
+      saveChanges: 'Save Changes',
+      manageBranding: 'Manage Branding',
+      restaurantName: 'Restaurant Name',
+      brandColor: 'Brand Color',
+      logoUrl: 'Logo URL',
+      uploadLogo: 'Upload Logo',
+      branding: 'Branding',
       categories: {
-        appetizers: 'Appetizers',
         main: 'Main Courses',
-        desserts: 'Desserts',
-        drinks: 'Drinks'
+        cooked: 'Cooked Meals',
+        cold: 'Cold Appetizers',
+        grill: 'From the Grill',
+        drinks: 'Drinks',
+        sweets: 'Sweet Program'
       },
       roles: {
         waiter: 'Waiter',

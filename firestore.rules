@@ -39,6 +39,23 @@
 //   - password: string (required)
 //   - joinedAt: string (required)
 //
+// Collection: categories
+// Fields:
+//   - id: string (required)
+//   - name: string (required)
+//
+// Collection: about
+// Fields:
+//   - bs: map (required)
+//   - en: map (required)
+//
+// Collection: gallery
+// Fields:
+//   - id: string (required)
+//   - url: string (required)
+//   - alt: string (optional)
+//   - createdAt: string (required)
+//
 // ===============================================================
 
 rules_version = '2';
@@ -55,8 +72,19 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && 
-             request.auth.token.email == "jasminhalilovic122@gmail.com" && 
-             request.auth.token.email_verified == true;
+             ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+              (request.auth.token.email == "jasminhalilovic122@gmail.com"));
+    }
+
+    function isWorker() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'worker';
+    }
+
+    function isStaff() {
+      return isAdmin() || isWorker();
     }
 
     // Since we are using a custom password system for workers in the UI, 
@@ -67,7 +95,10 @@ service cloud.firestore {
       return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
              data.price is number && data.price >= 0 &&
              data.category is string &&
-             data.image is string;
+             data.image is string &&
+             (!('isSpecial' in data) || data.isSpecial is bool) &&
+             (!('promotionPrice' in data) || data.promotionPrice is number) &&
+             (!('promotionText' in data) || data.promotionText is string);
     }
 
     function isValidReservation(data) {
@@ -112,16 +143,71 @@ service cloud.firestore {
     function isValidUserProfile(data) {
       return data.uid == request.auth.uid &&
              data.name is string &&
-             data.email is string;
+             data.email is string &&
+             data.role is string;
+    }
+
+    function isValidReview(data) {
+      return isAuthenticated() &&
+             data.customerUid == request.auth.uid &&
+             data.customerName is string &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() < 1000 &&
+             data.createdAt is string;
+    }
+
+    function isValidSettings(data) {
+      return data.loyaltyProgramEnabled is bool &&
+             data.loyaltyPointsPerKM is number &&
+             data.restaurantName is string && data.restaurantName.size() < 100 &&
+             data.brandColor is string && data.brandColor.matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$") &&
+             (!('logoUrl' in data) || data.logoUrl is string);
+    }
+
+    function isValidAboutContent(data) {
+      return data.bs is map && data.en is map &&
+             data.bs.storyTitle is string && data.bs.storyTitle.size() < 200 &&
+             data.bs.storyText is string && data.bs.storyText.size() < 5000 &&
+             data.bs.missionTitle is string && data.bs.missionTitle.size() < 200 &&
+             data.bs.missionText is string && data.bs.missionText.size() < 2000 &&
+             data.bs.teamTitle is string && data.bs.teamTitle.size() < 200 &&
+             data.bs.teamText is string && data.bs.teamText.size() < 2000 &&
+             data.en.storyTitle is string && data.en.storyTitle.size() < 200 &&
+             data.en.storyText is string && data.en.storyText.size() < 5000 &&
+             data.en.missionTitle is string && data.en.missionTitle.size() < 200 &&
+             data.en.missionText is string && data.en.missionText.size() < 2000 &&
+             data.en.teamTitle is string && data.en.teamTitle.size() < 200 &&
+             data.en.teamText is string && data.en.teamText.size() < 2000;
+    }
+
+    function isValidGalleryImage(data) {
+      return data.url is string && data.url.size() > 0 && data.url.size() < 1000 &&
+             (!('alt' in data) || (data.alt is string && data.alt.size() < 500)) &&
+             data.createdAt is string;
     }
 
     // ===============================================================
     // Rules
     // ===============================================================
 
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidSettings(request.resource.data);
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isValidReview(request.resource.data);
+      allow update, delete: if isAdmin() || (isAuthenticated() && resource.data.customerUid == request.auth.uid);
+    }
+
     match /users/{userId} {
-      allow read: if isAuthenticated(); // Allow reading profiles for order context
-      allow write: if isOwner(userId) && isValidUserProfile(request.resource.data);
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin()); 
+      allow create: if isOwner(userId) && isValidUserProfile(request.resource.data) && 
+                    (request.resource.data.role == 'user' || (request.resource.data.role == 'admin' && request.auth.token.email == "jasminhalilovic122@gmail.com"));
+      allow update: if isAuthenticated() && 
+                    ((isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin());
+      allow delete: if isAdmin();
     }
 
     match /menu/{itemId} {
@@ -131,19 +217,29 @@ service cloud.firestore {
 
     match /reservations/{resId} {
       allow create: if isValidReservation(request.resource.data);
-      allow read, update: if isAdmin() || isDocOwner();
+      allow read, update: if isStaff() || isDocOwner();
       allow delete: if isAdmin();
     }
 
     match /orders/{orderId} {
       allow create: if isValidOrder(request.resource.data);
-      allow read, update: if isAdmin() || isDocOwner();
+      allow read, update: if isStaff() || isDocOwner();
       allow delete: if isAdmin();
     }
 
-    match /workers/{workerId} {
-      allow read: if true; // Public can read to enable login (PROTOTYPE ONLY - SECURE THIS IN PRODUCTION)
+    match /categories/{categoryId} {
+      allow read: if true;
       allow write: if isAdmin();
+    }
+
+    match /about/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidAboutContent(request.resource.data);
+    }
+
+    match /gallery/{imgId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidGalleryImage(request.resource.data);
     }
     
     // Default deny

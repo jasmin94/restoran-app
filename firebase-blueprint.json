@@ -10,7 +10,10 @@
         "description": { "type": "string" },
         "price": { "type": "number" },
         "category": { "type": "string" },
-        "image": { "type": "string" }
+        "image": { "type": "string" },
+        "isSpecial": { "type": "boolean" },
+        "promotionPrice": { "type": "number" },
+        "promotionText": { "type": "string" }
       },
       "required": ["name", "price", "category", "image"]
     },
@@ -78,6 +81,86 @@
         "joinedAt": { "type": "string" }
       },
       "required": ["name", "role", "email", "phone", "password", "joinedAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Represents a customer review",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerUid": { "type": "string" },
+        "customerName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "orderId": { "type": "string" }
+      },
+      "required": ["customerUid", "customerName", "rating", "comment", "createdAt"]
+    },
+    "AppSettings": {
+      "title": "App Settings",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "loyaltyProgramEnabled": { "type": "boolean" },
+        "loyaltyPointsPerKM": { "type": "number" },
+        "restaurantName": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "brandColor": { "type": "string" }
+      },
+      "required": ["loyaltyProgramEnabled", "loyaltyPointsPerKM", "restaurantName", "brandColor"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "A menu category",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "AboutContent": {
+      "title": "About Content",
+      "description": "Represents the content of the About Us page",
+      "type": "object",
+      "properties": {
+        "bs": {
+          "type": "object",
+          "properties": {
+            "storyTitle": { "type": "string" },
+            "storyText": { "type": "string" },
+            "missionTitle": { "type": "string" },
+            "missionText": { "type": "string" },
+            "teamTitle": { "type": "string" },
+            "teamText": { "type": "string" }
+          }
+        },
+        "en": {
+          "type": "object",
+          "properties": {
+            "storyTitle": { "type": "string" },
+            "storyText": { "type": "string" },
+            "missionTitle": { "type": "string" },
+            "missionText": { "type": "string" },
+            "teamTitle": { "type": "string" },
+            "teamText": { "type": "string" }
+          }
+        }
+      },
+      "required": ["bs", "en"]
+    },
+    "GalleryImage": {
+      "title": "Gallery Image",
+      "description": "An image in the restaurant gallery",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "url": { "type": "string" },
+        "alt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "url", "createdAt"]
     }
   },
   "firestore": {
@@ -100,6 +183,26 @@
     "users": {
       "schema": "UserProfile",
       "description": "Collection of client profiles"
+    },
+    "reviews": {
+      "schema": "Review",
+      "description": "Collection of customer reviews"
+    },
+    "settings": {
+      "schema": "AppSettings",
+      "description": "Global application settings"
+    },
+    "categories": {
+      "schema": "Category",
+      "description": "Collection of menu categories"
+    },
+    "about": {
+      "schema": "AboutContent",
+      "description": "Content for the About Us page"
+    },
+    "gallery": {
+      "schema": "GalleryImage",
+      "description": "Collection of gallery images"
     }
   }
 }
