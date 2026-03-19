@@ -156,24 +156,6 @@ export default function App() {
       setMenuItems(items.length > 0 ? items : INITIAL_MENU_ITEMS);
     }, (err) => handleFirestoreError(err, OperationType.LIST, 'menu'));
 
-    const qUsers = query(collection(db, 'users'), where('role', '==', 'worker'));
-    const unsubscribeWorkers = onSnapshot(qUsers, (snapshot) => {
-      const fetchedWorkers = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name,
-          role: data.workerRole || 'waiter',
-          email: data.email,
-          phone: data.phone || '',
-          password: '••••••••',
-          joinedAt: data.joinedAt || data.createdAt,
-          permissions: data.permissions
-        } as Worker;
-      });
-      setWorkers(fetchedWorkers);
-    }, (err) => handleFirestoreError(err, OperationType.LIST, 'users'));
-
     const qCategories = query(collection(db, 'categories'), orderBy('name'));
     const unsubscribeCategories = onSnapshot(qCategories, (snapshot) => {
       const fetchedCategories = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Category));
@@ -250,7 +232,6 @@ export default function App() {
     return () => {
       unsubscribeAuth();
       unsubscribeMenu();
-      unsubscribeWorkers();
       unsubscribeCategories();
       unsubscribeSettings();
       unsubscribeReviews();
@@ -275,6 +256,7 @@ export default function App() {
     
     let unsubscribeRes: (() => void) | undefined;
     let unsubscribeOrders: (() => void) | undefined;
+    let unsubscribeWorkers: (() => void) | undefined;
     let unsubscribeClientOrders: (() => void) | undefined;
     let unsubscribeClientRes: (() => void) | undefined;
 
@@ -292,9 +274,35 @@ export default function App() {
       }, (err) => {
         handleFirestoreError(err, OperationType.LIST, 'orders');
       });
+
+      // Only admins can list all workers
+      if (userRole === 'admin' && auth.currentUser) {
+        console.log("Setting up workers listener for admin:", auth.currentUser.uid);
+        const qUsers = query(collection(db, 'users'), where('role', '==', 'worker'));
+        unsubscribeWorkers = onSnapshot(qUsers, (snapshot) => {
+          const fetchedWorkers = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name,
+              role: data.workerRole || 'waiter',
+              email: data.email,
+              phone: data.phone || '',
+              password: '••••••••',
+              joinedAt: data.joinedAt || data.createdAt,
+              permissions: data.permissions
+            } as Worker;
+          });
+          setWorkers(fetchedWorkers);
+        }, (err) => {
+          console.error("Workers listener error:", err);
+          handleFirestoreError(err, OperationType.LIST, 'users');
+        });
+      }
     } else {
       setReservations([]);
       setOrders([]);
+      setWorkers([]);
     }
 
     // Client Listeners
@@ -324,6 +332,7 @@ export default function App() {
     return () => {
       unsubscribeRes?.();
       unsubscribeOrders?.();
+      unsubscribeWorkers?.();
       unsubscribeClientOrders?.();
       unsubscribeClientRes?.();
     };
@@ -755,6 +764,13 @@ export default function App() {
             className="flex items-center gap-2 cursor-pointer" 
             onClick={() => {
               if (activeTab === 'home') {
+                // Only allow staff to trigger hidden admin panel
+                if (userRole === 'admin' || userRole === 'worker') {
+                  setActiveTab('admin');
+                  window.scrollTo(0, 0);
+                  return;
+                }
+
                 setAdminTriggerCount(prev => {
                   const next = prev + 1;
                   if (next >= 5) {
